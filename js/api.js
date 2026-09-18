@@ -11,7 +11,7 @@ function apiRequest(endpoint, options = {}) {
     }
     const token = getToken();
     if (token) {
-        headers.Authorization = `baerer: ${token}`;
+        headers.Authorization = `Bearer ${token}`;
 
     }
     const config = {
