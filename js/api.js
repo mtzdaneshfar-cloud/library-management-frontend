@@ -31,6 +31,7 @@ function apiRequest(endpoint, options = {}) {
         })
         .then(function(data) {
             console.log('داده دریافت شد:', data);
+            return data
         })
         .catch(function(error) {
             console.error('خطا در درخواست:', error);
