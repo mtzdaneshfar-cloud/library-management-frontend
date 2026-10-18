@@ -1,8 +1,6 @@
 const API_BASE_URL = 'https://haditabatabaei.dev/api';
 
 
-
-
 function apiRequest(endpoint, options = {}) {
     const url = API_BASE_URL + (endpoint.startsWith('/') ? endpoint : '/' + endpoint);
     console.log('آدرس درخواست ما:', url);
@@ -15,29 +13,31 @@ function apiRequest(endpoint, options = {}) {
     }
 
     if (token) {
-        headers.Authorization = `Bearer ${token}`;
+        headers.Authorization = 'Bearer ' + token;
 
     }
     const config = {
         ...options,
         headers: headers
     }
+
     return fetch(url, config)
-        .then(async (response) => {
-        
-            let data = null;
-            try {
-                data = await response.json();
-            } catch (e) { }
-
-            
-            if (!response.ok) {
-                const message = (data && (data.message || data.error || data.msg))
-                    || `خطای سرور با کد وضعیت: ${response.status}`;
-                throw new Error(message);
+        .then(function(response) {
+           if (!response.ok) {
+                console.log('پاسخ ناموفق بود:', response.status);
+                return null; 
             }
+            return response.json();
+        })
+        .then(function(data) {
+            console.log('داده دریافت شد:', data);
+        })
+        .catch(function(error) {
+            console.error('خطا در درخواست:', error);
 
-            return data;
+            return null;
         });
-
-}
+    
+    
+    
+    }
