@@ -17,10 +17,9 @@ function renderBooks(books) {
 
     booksGrid.innerHTML = books.map(book => {
         const isAvailable = (book.availableCopies !== undefined ? book.availableCopies > 0 : book.status === 'available');
-        const statusClass = isAvailable ? 'status-available' : 'status-unavailable';
-        const statusText = isAvailable ? 'Available' : 'Unavailable';
-        const copiesCount = book.availableCopies ?? book.copies ?? (isAvailable ? 1 : 0);
-
+        const badgeClass = isAvailable ? 'badge-success' : 'badge-danger';
+        const badgeText = isAvailable ? 'موجود' : 'ناموجود';
+        const copiesCount = book.availableCopies !== undefined ? book.availableCopies : (book.copies || 0);
         const borrowButton = isAvailable
             ? `<button class="btn btn-primary btn-sm" onclick="borrowBook('${book.id || book._id}')">Borrow Book</button>`
             : `<button class="btn btn-secondary btn-sm" disabled>Not Available</button>`;
@@ -29,7 +28,7 @@ function renderBooks(books) {
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
                     <h3 style="margin: 0; color: #2c3e50;">${book.title || 'بدون عنوان'}</h3>
-                    <span class="status ${statusClass}">${statusText}</span>
+                    <span class="status ${badgeClass}">${badgeText}</span>
                 </div>
                 <p style="color: #666; margin-bottom: 0.5rem;"><strong>Author:</strong> ${book.author || 'نامشخص'}</p>
                 <p style="color: #666; margin-bottom: 0.5rem;"><strong>ISBN:</strong> ${book.isbn || '-'}</p>
@@ -102,38 +101,47 @@ if (document.readyState === 'loading') {
 }
 
 
-async function borrowBook(bookId) {
+function borrowBook(bookId) {
     if (!bookId) {
         alert('شناسه کتاب نامعتبر است.');
         return;
     }
 
-
-    const confirmBorrow = confirm('آیا از امانت گرفتن این کتاب اطمینان دارید؟');
-    if (!confirmBorrow) return;
-    
-    try {
-
-        const response = await apiRequest('/loans', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ bookId: bookId })
-        });
-
-        console.log('نتیجه ثبت امانت:', response);
-        alert('کتاب با موفقیت به لیست امانت‌های شما افزوده شد.');
-
-
-        localStorage.removeItem(CACHE_KEY);
-
-
-        loadBooks();
-
-    } catch (error) {
-        console.error('خطا در فرایند امانت کتاب:', error);
-
-
-        const errorMsg = error.message || 'خطا در ثبت امانت کتاب. ممکن است نسخه موجود به اتمام رسیده باشد.';
-        alert(`عملیات ناموفق بود: ${errorMsg}`);
+    if (!confirm('آیا از امانت گرفتن این کتاب اطمینان دارید؟')) {
+        return;
     }
+
+       apiRequest('/auth/me')
+        .then(function(response) {
+          
+            console.log('محتوای پاسخ دریافتی از /auth/me:', response);
+            const userId = response.data.user.id;
+
+            if (!userId) {
+                throw new Error('شناسه کاربر یافت نشد.');
+            }
+
+         
+            return apiRequest('/loans', {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    bookId: bookId, 
+                    userId: userId 
+                })
+            });
+        })
+        .then(function(result) {
+         
+            alert('کتاب با موفقیت امانت گرفته شد.');
+         
+            localStorage.removeItem(CACHE_KEY);
+            if (typeof loadBooks === 'function') {
+                loadBooks();
+            }
+        })
+        .catch(function(error) {
+         
+            console.error('خطا در ثبت امانت:', error);
+            alert('خطا در ثبت امانت: ' + (error.message || 'مشکل در ارتباط با سرور'));
+        });
 }
