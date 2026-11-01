@@ -14,18 +14,18 @@ if (logoutBtn) {
 const availableBooksEl = document.getElementById('availableBooks');
 const activeLoansEl = document.getElementById('activeLoans');
 
-apiRequest('/books')
-    .then((response) => {
-        const booksList = response.data || [];
-        const availableCount = booksList.filter(book => book.availableCopies > 0).length;
-        if (availableBooksEl) {
-            availableBooksEl.textContent = availableCount;
-        }
-    })
-    .catch((error) => {
-        console.error('خطا در دریافت لیست کتاب:', error);
+// apiRequest('/books')
+//     .then((response) => {
+//         const booksList = response.data || [];
+//         const availableCount = booksList.filter(book => book.availableCopies > 0).length;
+//         if (availableBooksEl) {
+//             availableBooksEl.textContent = availableCount;
+//         }
+//     })
+//     .catch((error) => {
+//         console.error('خطا در دریافت لیست کتاب:', error);
 
-    });
+//     });
 
 
 
@@ -37,6 +37,7 @@ const userAvatarEl = document.getElementById('userAvatar');
 
 apiRequest('/auth/me')
     .then(function (response) {
+          console.log('--- پاسخ سرور برای /auth/me ---', response);
         if (response && response.data) {
             const user = response.data.user;
             const stats = response.data.stats;
