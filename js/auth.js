@@ -32,6 +32,46 @@ function isAuthenticated() {
     return token !== null && token !== "";
 }
 
+function renderUserProfile() {
+    const nameEl = document.querySelector('.user-info span');
+    const avatarEl = document.querySelector('.user-avatar');
+
+    if (!nameEl) return;
+
+   
+    const cachedUser = localStorage.getItem('user');
+    if (cachedUser) {
+        const user = JSON.parse(cachedUser);
+        const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || 'Student';
+        nameEl.textContent = fullName;
+        if (avatarEl && fullName) {
+            avatarEl.textContent = fullName.charAt(0).toUpperCase();
+        }
+        return;
+    }
+
+   
+    apiRequest('/auth/me')
+        .then((response) => {
+            const user = response.data?.user || response.data;
+            if (user) {
+                localStorage.setItem('user', JSON.stringify(user));
+                const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || 'Student';
+                nameEl.textContent = fullName;
+                if (avatarEl && fullName) {
+                    avatarEl.textContent = fullName.charAt(0).toUpperCase();
+                }
+            }
+        })
+        .catch((error) => {
+            console.error('Error fetching user profile:', error);
+        });
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderUserProfile();
+});
 
 function logout() {
     removeToken();

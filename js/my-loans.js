@@ -1,5 +1,5 @@
 
-console.log('--- TEST: my-loans.js اجرا شد ---');
+
 if (!isAuthenticated()) {
      console.log('کاربر لاگین نیست، هدایت به login.html');
     window.location.href = 'login.html';
@@ -13,7 +13,7 @@ if (logoutBtn) {
     });
 }
 const loansTableBody = document.getElementById('loansTableBody');
-console.log('المان loansTableBody در صفحه:', loansTableBody);
+
 
 function loadMyLoans() {
     apiRequest('/loans/my-loans')
@@ -27,9 +27,9 @@ function loadMyLoans() {
                 return;
             }
 
-            // ساخت سطرهای جدول بر اساس فیلدهای دریافتی سرور
+           
             loansTableBody.innerHTML = loans.map(function(loan) {
-                console.log('در حال ساخت سطر برای کتاب:', loan.book?.title);
+               
                 const bookTitle = loan.book ? loan.book.title : 'بدون عنوان';
                 const loanDate = new Date(loan.loanDate).toLocaleDateString('fa-IR');
                 const dueDate = new Date(loan.dueDate).toLocaleDateString('fa-IR');
@@ -67,10 +67,10 @@ function returnBook(loanId) {
         return;
     }
 
-    // تست با متد POST
+   
     apiRequest(`/loans/${loanId}/return`, { method: 'POST' })
         .then(function(response) {
-            console.log('پاسخ بازگشت کتاب:', response);
+          
             if (response && response.success) {
                 alert('کتاب با موفقیت بازگردانده شد.');
                 loadMyLoans();
