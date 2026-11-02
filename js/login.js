@@ -12,7 +12,7 @@ document.getElementById('loginForm').addEventListener('submit', (event) => {
         return;
     }
 
-    console.log(usernameInput,passwordInput);
+   
 
     apiRequest('/auth/login', {
      method: 'POST',
@@ -24,7 +24,7 @@ document.getElementById('loginForm').addEventListener('submit', (event) => {
     })
 
     .then((data) => {
-        console.log('پاسخ سرور',data);
+        
         setToken(data.token);
         window.location.href = 'dashboard.html'
     })
